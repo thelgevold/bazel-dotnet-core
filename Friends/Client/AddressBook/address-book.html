@@ -1,0 +1,11 @@
+<div>
+  <h1>{{title}}</h1>
+
+  <table class="table">
+    <tr *ngFor="let person of res | async">
+      <td>{{person.name}}</td>
+    </tr>
+  </table>
+</div>
+
+<h4><a href="http://www.syntaxsuccess.com/viewarticle/dependency-injection-in-angular-2.0">Read more here</a></h4>

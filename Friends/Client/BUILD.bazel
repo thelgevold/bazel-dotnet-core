@@ -1,0 +1,76 @@
+package(default_visibility = ["//visibility:public"])
+load("@npm_bazel_rollup//:index.bzl", "rollup_bundle")
+load("@npm_angular_bazel//:index.bzl", "ng_module")
+load("@npm//@babel/cli:index.bzl", "babel")
+load("@npm_bazel_terser//:index.bzl", "terser_minified")
+
+ANGULAR_IMPORTS = [
+    "@npm//@angular/animations",
+    "@npm//@angular/forms",
+    "@npm//@angular/router",
+    "@npm//@angular/core",
+    "@npm//@angular/platform-browser",
+]
+
+ng_module(
+    name = "angular",
+    srcs = [
+      "main.ts", 
+      "app.module.ts",
+      "app.component.ts",
+      "app.routes.ts"
+    ],
+    assets = ["app.component.html"],
+    tsconfig = "//:tsconfig.json",
+    deps = ANGULAR_IMPORTS + [
+            "@npm//rxjs",
+            "//Friends/Client/Treeview:src",
+            "//Friends/Client/Survey:src",
+            "//Friends/Client/AddressBook:src"
+    ]
+)
+
+rollup_bundle(
+    name = "bundle-es2015",
+    entry_points = {":main.ts": "index"},
+    config_file = "rollup.config.js",
+    deps = [
+        ":angular",
+        "@npm//@angular/common",
+        "@npm//@angular/core",
+        "@npm//@angular/platform-browser",
+        "@npm//@angular/router",
+        "@npm//rxjs",
+        "@npm//rollup-plugin-commonjs",
+        "@npm//rollup-plugin-node-resolve",
+    ],
+)
+
+babel(
+    name = "bundle-es5",
+    args = [
+        "$(execpath :bundle-es2015)",
+        "--no-babelrc",
+        "--source-maps",
+        "--presets=@babel/preset-env",
+        "--out-dir",
+        "$(@D)",
+    ],
+    data = [
+        ":bundle-es2015",
+        "@npm//@babel/preset-env",
+    ],
+    output_dir = True,
+)
+
+terser_minified(
+    name = "bundle-es5.min",
+    src = ":bundle-es5",
+)
+
+terser_minified(
+    name = "bundle-es2015.min",
+    src = ":bundle-es2015",
+)
+
+load("@npm_bazel_terser//:index.bzl", "terser_minified")

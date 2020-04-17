@@ -1,0 +1,42 @@
+load("@io_bazel_rules_dotnet//dotnet:defs.bzl", "core_binary")
+
+load("//Friends/Vendor:vendor.bzl", "vendor_bundle")
+load("@npm_bazel_terser//:index.bzl", "terser_minified")
+
+vendor_bundle(
+  name = "vendor",
+  deps = [
+    "@npm//:node_modules/zone.js/dist/zone.js"
+  ]
+)
+
+terser_minified(
+    name = "vendor_min",
+    src = ":vendor",
+)
+
+genrule(
+    name = "bootstrap",
+    srcs = ["//:node_modules/bootstrap/dist/css/bootstrap.min.css"],
+    outs = ["bootstrap.min.css"],
+    cmd = "cp $< $@",
+)
+
+core_binary(
+    name = "server.exe",
+    srcs = glob([
+        "**/*.cs"
+    ]),
+    deps = [
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:Microsoft.AspNetCore.App",
+        "@io_bazel_rules_dotnet//dotnet/stdlib.core:libraryset",
+        "//Model:Friend.dll"
+    ],
+    data = [
+      ":index.html",
+      "//Friends/Client:bundle-es2015.min",
+      ":vendor_min",
+      ":site.css",
+      ":bootstrap"
+    ]
+)
