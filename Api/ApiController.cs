@@ -10,7 +10,8 @@ namespace Friends {
   public class FriendsController : Controller {
     [Route ("")]
     public IEnumerable<Friend> Get () {
-      return new Friend[] { new Friend () { Name = "Joe" }, new Friend () { Name = "Jane" }, new Friend () { Name = "Jim" } };
+      var header = Request.Headers["Best-Friend"];
+      return new Friend[] { new Friend () { Name = "Joe" }, new Friend () { Name = "Jane" }, new Friend () { Name = "Jim" }, new Friend () { Name = header } };
     }
   }
 }

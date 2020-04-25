@@ -17,7 +17,8 @@ namespace Friends {
             Host.CreateDefaultBuilder (args)
             .UseContentRoot (".")
             .ConfigureWebHostDefaults (webBuilder => {
-                webBuilder.UseStartup<Startup> ();
+                webBuilder.UseStartup<Startup> ()
+                    .UseUrls ("http://localhost:5050");
             });
     }
 }
